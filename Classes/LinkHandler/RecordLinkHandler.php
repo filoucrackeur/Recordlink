@@ -191,12 +191,11 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
         return $this->linkBrowser->getScriptUrl();
     }
 
+    // *********
+    // Internal:
+    // *********
 
-
-
-
-
-    public function getRecordSelector() {
+    protected function getRecordSelector() {
         $out = '';
         $out .= '<h3>'
             . $GLOBALS['LANG']->sL('LLL:EXT:recordlink/Resources/Private/Language/locallang_be.xlf:select_linktype')
@@ -221,7 +220,7 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
         return $out;
     }
 
-    public function getRecordList() {
+    protected function getRecordList() {
         $out = '';
         $table = $this->configuration[$this->config . '.']['table'];
         $id = intval($this->configuration[$this->config . '.']['pid']);
@@ -233,7 +232,7 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
         if ($table) {
             $elementBrowser = GeneralUtility::makeInstance(\TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList::class);
             $elementBrowser->start($id, $table, $pointer,
-                GeneralUtility::_GP('search_field'),
+                $this->searchString,
                 $recursive,
                 10
             );
@@ -254,7 +253,8 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
             } else {
                 $out .= $list;
             }
-
+            //linkWrapItems
+            //$out .= $elementBrowser->getSearchBox();
             $out .= $this->getSearchBox($elementBrowser);
 
         }
@@ -262,7 +262,7 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
         return $out;
     }
 
-    public function getSearchBox($elementBrowser) {
+    protected function getSearchBox($elementBrowser) {
 
         $formElements = array('<form action="' . htmlspecialchars($elementBrowser->listURL() . '&act=record&config='.$this->config) . '" method="post" style="padding:0;">', '</form>');
 
@@ -285,8 +285,5 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
             . '<br><br>';
         return $content;
     }
-
-
-
 
 }
