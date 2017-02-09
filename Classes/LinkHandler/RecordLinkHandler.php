@@ -253,7 +253,7 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
 
             $list = $elementBrowser->getTable($table, $id, $GLOBALS['TCA'][$table]['ctrl']['label']);
 
-            if (!empty($list)) {
+            if (empty($list)) {
                 $out .= '<div class="alert alert-info">'
                     . $GLOBALS['LANG']->sL('LLL:EXT:recordlink/Resources/Private/Language/locallang_be.xlf:norecords_found')
                     . '</div>';
