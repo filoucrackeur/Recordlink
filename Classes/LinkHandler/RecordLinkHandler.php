@@ -122,7 +122,6 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
 
         $recordselector = $this->getRecordSelector();
         $recordlist = $this->getRecordList();
-
         $content = '';
         $content .= '
 
