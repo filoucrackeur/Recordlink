@@ -15,6 +15,7 @@ namespace Intera\Recordlink\LinkHandler;
  */
 use TYPO3\CMS\Recordlist\LinkHandler\AbstractLinkHandler;
 use TYPO3\CMS\Recordlist\LinkHandler\LinkHandlerInterface;
+use TYPO3\CMS\Recordlist\Controller\AbstractLinkBrowserController;
 
 use Intera\Recordlink\Browser\RecordBrowser;
 
@@ -42,6 +43,24 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
     protected $linkParts = [];
 
     /**
+     * Initialize the handler
+     *
+     * @param AbstractLinkBrowserController $linkBrowser
+     * @param string $identifier
+     * @param array $configuration Page TSconfig
+     *
+     * @return void
+     */
+    public function initialize(AbstractLinkBrowserController $linkBrowser, $identifier, array $configuration)
+    {
+        parent::initialize($linkBrowser, $identifier, $configuration);
+        $this->configuration = $configuration;
+        $this->config = GeneralUtility::_GP('config');
+        $this->searchString = GeneralUtility::_GP('search_field');
+        $this->pointer = intval(GeneralUtility::_GP('pointer'));
+    }
+
+    /**
      * Checks if this is the handler for the given link
      *
      * The handler may store this information locally for later usage.
@@ -57,17 +76,23 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
             return false;
         }
 
-        list($handler, $recordTable, $recordId) = explode(':', $linkParts['url']);
+        list($handler, $config, $uid) = explode(':', $linkParts['url']);
 
         if ($handler != 'record') {
             return false;
         }
-        // TODO: check $recordTable
-        // TODO: check $recordId
+
+
+        if (isset($this->configuration[$config . '.']['table'])) {
+            $table = $this->configuration[$config.'.']['table'];
+        }
 
         $this->linkParts = $linkParts;
-        $this->linkParts['table'] = $recordTable;
-        $this->linkParts['recordid'] = $recordId;
+        $this->linkParts['act'] = 'record';
+        $this->linkParts['info'] = $this->configuration[$config.'.']['label'];
+        $this->linkParts['config'] = $config;
+        $this->linkParts['recordTable'] = $table;
+        $this->linkParts['recordUid'] = $uid;
 
         return true;
     }
@@ -79,15 +104,15 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
      */
     public function formatCurrentUrl()
     {
-        // TODO: check config
-        $table = $this->linkParts['table'];
-        $uid = $this->linkParts['recordid'];
+        $label = $this->linkParts['info'];
+        $table = $this->linkParts['recordTable'];
+        $uid = $this->linkParts['recordUid'];
         $record = BackendUtility::getRecordWSOL($table, $uid);
         $title = BackendUtility::getRecordTitle($table, $record, FALSE, TRUE);
         $titleLen = (int)$this->getBackendUser()->uc['titleLen'];
         $title = GeneralUtility::fixed_lgd_cs($title, $titleLen);
 
-        return '\'' . $title . '\' (' . $table . ':' . $uid . ')';
+        return $label . ' \'' . $title . '\' (ID:' . $uid . ')';
     }
 
     /**
@@ -101,10 +126,8 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
     {
         GeneralUtility::makeInstance(PageRenderer::class)->loadRequireJsModule('Intera/Recordlink/LinkHandler/RecordLinkHandler');
 
-        $backendUser = $this->getBackendUser();
-
-        $recordselector = 'TODO: selector';
-        $recordlist = 'TODO: recordlist';
+        $recordselector = $this->getRecordSelector();
+        $recordlist = $this->getRecordList();
 
         $content = '';
         $content .= '
@@ -112,11 +135,10 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
 				<!--
 					Wrapper table for record Selector:
 				-->
-						<table border="0" cellpadding="0" cellspacing="0" id="typo3-linkFiles">
+						<table border="0" cellpadding="0" cellspacing="0" id="typo3-EBrecords">
 							<tr>
-								<td class="c-wCell" valign="top"><h3>' . $GLOBALS['LANG']->sL('LLL:EXT:recordlink/Resources/Private/Language/locallang_be.xlf:select_record') . ':</h3>' . $recordselector . $recordlist . '</td>
+								<td class="c-wCell" valign="top">' . $recordselector . $recordlist . '</td>
 							</tr>
-							
 						</table>
 						';
 
@@ -133,11 +155,13 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
             return [];
         }
 
-        $table = $this->linkParts['table'];
-        $uid = $this->linkParts['recordid'];
+        $config = $this->linkParts['config'];
+        $uid = $this->linkParts['recordUid'];
+        $addPassOnParams = '&config=' . $config;
 
         return [
-            'data-current-link' => 'record:' . $table . ':' . $uid
+            'data-current-link' => empty($this->linkParts) ? '' : 'record:' . $config . ':' . $uid,
+            'data-add-on-params' => '&act=record'
         ];
     }
 
@@ -173,30 +197,100 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
         return $this->linkBrowser->getScriptUrl();
     }
 
-    /**
-     * @param string[] $fieldDefinitions Array of link attribute field definitions
-     * @return string[]
-     */
-    public function modifyLinkAttributes(array $fieldDefinitions)
-    {
-        $configuration = $this->linkBrowser->getConfiguration();
-        if (!empty($configuration['pageIdSelector.']['enabled'])) {
-            array_push($this->linkAttributes, 'pageIdSelector');
-            $fieldDefinitions['pageIdSelector'] = '
-				<tr>
-					<td>
-						<label>
-							' . $this->getLanguageService()->getLL('page_id', true) . ':
-						</label>
-					</td>
-					<td colspan="3">
-						<input type="text" size="6" name="luid" id="luid" /> <input class="btn btn-default t3js-pageLink" type="submit" value="'
-            . $this->getLanguageService()->getLL('setLink', true) . '" />
-					</td>
-				</tr>';
+
+
+
+
+
+    public function getRecordSelector() {
+        $out = '';
+        $out .= '<h3>'
+            . $GLOBALS['LANG']->sL('LLL:EXT:recordlink/Resources/Private/Language/locallang_be.xlf:select_linktype')
+            . ':</h3>';
+        $out .= '<div class="form-group">';
+        $onChange = 'onchange="jumpToUrl(' . GeneralUtility::quoteJSvalue('?act=record&config=') . ' + this.value); return false;"';
+        $out .= '<select class="form-control" ' . $onChange . ' >';
+        $out .= '<option value=""></option>';
+        if (empty($this->config)) {
+            $this->config = $this->linkParts['config'];
         }
-        return $fieldDefinitions;
+        foreach ($this->configuration as $key => $config) {
+            $key = substr($key, 0, -1);
+            if($key==$this->config) {
+                $out .= '<option value="'.$key.'" selected="selected">'.$config['label'].'</option>';
+            } else {
+                $out .= '<option value="'.$key.'">'.$config['label'].'</option>';
+            }
+        }
+        $out .= '</select>';
+        $out .= '</div>';
+        return $out;
     }
+
+    public function getRecordList() {
+        $out = '';
+        $table = $this->configuration[$this->config . '.']['table'];
+        $id = intval($this->configuration[$this->config . '.']['pid']);
+        $pointer = $this->pointer;
+        $recursive = intval($this->configuration[$this->config . '.']['recursive']);
+        if (empty($recursive)) {
+            $recursive = 1;
+        }
+        if ($table) {
+            $elementBrowser = GeneralUtility::makeInstance(\TYPO3\CMS\Recordlist\RecordList\DatabaseRecordList::class);
+            $elementBrowser->start($id, $table, $pointer,
+                GeneralUtility::_GP('search_field'),
+                $recursive,
+                10
+            );
+            $elementBrowser->setDispFields('pid');
+            $elementBrowser->pidSelect = '1=1';
+            $elementBrowser->disableSingleTableView = TRUE;
+            $elementBrowser->clickMenuEnabled = FALSE;
+            $elementBrowser->noControlPanels = TRUE;
+            $elementBrowser->searchLevels = FALSE;
+            $elementBrowser->generateList();
+
+            $list = $elementBrowser->getTable($table, $id, $GLOBALS['TCA'][$table]['ctrl']['label']);
+
+            if (!empty($list)) {
+                $out .= '<div class="alert alert-info">'
+                    . $GLOBALS['LANG']->sL('LLL:EXT:recordlink/Resources/Private/Language/locallang_be.xlf:norecords_found')
+                    . '</div>';
+            }
+
+            $out .= $this->getSearchBox($elementBrowser);
+
+        }
+
+        return $out;
+    }
+
+    public function getSearchBox($elementBrowser) {
+
+        $formElements = array('<form action="' . htmlspecialchars($elementBrowser->listURL() . '&act=record&config='.$this->config) . '" method="post" style="padding:0;">', '</form>');
+
+        // Table with the search box:
+        $content = '<div class="db_list-searchbox-form">
+			' . $formElements[0] . '
+
+				<!--
+					Search box:
+				-->
+				<table border="0" cellpadding="0" cellspacing="0" id="typo3-dblist-search">
+					<tr>
+						<td style="padding-right:10px;">' . $GLOBALS['LANG']->sL('LLL:EXT:lang/locallang_core.xlf:labels.enterSearchString', TRUE) . '</td>
+						<td><input type="text" name="search_field" id="search_field" value="' . htmlspecialchars($this->searchString) . '" style="width: 100%; height: 23px;" /></td>
+						<td><input type="submit" name="search" value="' . $GLOBALS['LANG']->sL('LLL:EXT:lang/locallang_core.xlf:labels.search', TRUE) . '" /></td>
+					</tr>
+				</table>
+			' . $formElements[1]
+            . '</div>'
+            . '<br><br>';
+        return $content;
+    }
+
+
 
 
 }

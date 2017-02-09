@@ -12,6 +12,9 @@
       <trans-unit id="select_record">
         <source>Select Record</source>
       </trans-unit>
+      <trans-unit id="norecords_found">
+        <source>No records found.</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>
