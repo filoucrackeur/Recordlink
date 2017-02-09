@@ -12,7 +12,7 @@
  */
 
 /**
- * Module: Intera/Recordlink/RecordLinkHandler
+ * Module: TYPO3/CMS/Recordlink/RecordLinkHandler
  * Record link interaction
  */
 define(['jquery', 'TYPO3/CMS/Recordlist/LinkBrowser'], function($, LinkBrowser) {
