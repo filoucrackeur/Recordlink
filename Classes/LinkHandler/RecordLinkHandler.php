@@ -257,6 +257,8 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
                 $out .= '<div class="alert alert-info">'
                     . $GLOBALS['LANG']->sL('LLL:EXT:recordlink/Resources/Private/Language/locallang_be.xlf:norecords_found')
                     . '</div>';
+            } else {
+                $out .= $list;
             }
 
             $out .= $this->getSearchBox($elementBrowser);
