@@ -118,7 +118,7 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
      */
     public function render(ServerRequestInterface $request)
     {
-        GeneralUtility::makeInstance(PageRenderer::class)->loadRequireJsModule('Intera/Recordlink/LinkHandler/RecordLinkHandler');
+        GeneralUtility::makeInstance(PageRenderer::class)->loadRequireJsModule('Intera/Recordlink/RecordLinkHandler');
 
         $recordselector = $this->getRecordSelector();
         $recordlist = $this->getRecordList();
