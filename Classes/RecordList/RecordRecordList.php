@@ -25,7 +25,6 @@ use TYPO3\CMS\Core\Imaging\Icon;
 class RecordRecordList extends DatabaseRecordList
 {
 
-
 	public $configKey = '';
 
 	/**
