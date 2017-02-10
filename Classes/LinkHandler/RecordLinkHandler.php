@@ -235,17 +235,18 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
 	        $recordRecordList = GeneralUtility::makeInstance(\Intera\Recordlink\RecordList\RecordRecordList::class);
 	        $recordRecordList->configKey = $configKey;
 	        $recordRecordList->iLimit = 10;
-	        $recordRecordList->pidSelect = 'pid IN(' . $id . ')';
 	        $recordRecordList->disableSingleTableView = TRUE;
 	        $recordRecordList->clickMenuEnabled = FALSE;
 	        $recordRecordList->noControlPanels = TRUE;
 	        $recordRecordList->searchLevels = FALSE;
+	        $recordRecordList->setOverrideUrlParameters(array('linkAttributes' => GeneralUtility::_GP('linkAttributes'), 'P' => GeneralUtility::_GP('P')));
+
 	        $recordRecordList->start(
 	        	$id, $table, $pointer,
 		        $searchString,
 		        $recursive, 10
 	        );
-
+	        //$recordRecordList->generateList();
             $list = $recordRecordList->getTable($table, $id, $GLOBALS['TCA'][$table]['ctrl']['label']);
 
             if (empty($list)) {

@@ -74,8 +74,7 @@ class RecordRecordList extends DatabaseRecordList
 			return '';
 		}
 		$content = '';
-		$listURL = $this->listURL() . '&act=record&config='.$this->configKey;
-		//$listURL = 'javascript:jumpToUrl(' . GeneralUtility::quoteJSvalue('?act=record&config_key='.$this->configKey).'); return false;';
+		$listURL = $this->getBrowseURL();
 
 		// 1 = first page
 		// 0 = first element
@@ -168,7 +167,7 @@ class RecordRecordList extends DatabaseRecordList
 
 	public function getSearchBox() {
 
-		$formElements = array('<form action="' . htmlspecialchars($this->listURL() . '&act=record&config='.$this->configKey) . '" method="post" style="padding:0;">', '</form>');
+		$formElements = array('<form action="' . htmlspecialchars($this->getSearchURL()) . '" method="post" style="padding:0;">', '</form>');
 
 		// Table with the search box:
 		$content = '<div class="db_list-searchbox-form">
@@ -190,4 +189,13 @@ class RecordRecordList extends DatabaseRecordList
 		return $content;
 	}
 
+	public function getBrowseURL() {
+		if (!isset($this->browseURL)) {
+			$this->browseURL = $this->listURL() . '&act=record&config_key='.$this->configKey;
+		}
+		return $this->browseURL;
+	}
+	public function getSearchURL() {
+		return $this->getBrowseURL();
+	}
 }
