@@ -226,7 +226,7 @@ class ElementBrowser implements \TYPO3\CMS\Core\ElementBrowser\ElementBrowserHoo
         // Headline for selecting records:
       $cElements .= '<h3>'
       . $GLOBALS['LANG']->sL('LLL:EXT:recordlink/Resources/Private/Language/locallang_be.xlf:select_record')
-      . '</h3>';
+      . ':</h3>';
       
       // Initialize the record listing:
       $table = $this->configs[$this->config]['table'];

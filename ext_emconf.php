@@ -14,7 +14,7 @@ $EM_CONF[$_EXTKEY] = array (
 	'title' => 'Record Link',
 	'description' => 'Add custom link to records like system category or news',
 	'category' => 'plugin',
-	'version' => '1.0.1',
+	'version' => '1.1.0',
 	'state' => 'beta',
 	'uploadfolder' => false,
 	'createDirs' => '',
@@ -26,7 +26,7 @@ $EM_CONF[$_EXTKEY] = array (
 	array (
 		'depends' => 
 		array (
-			'typo3' => '6.2.0-6.2.99',
+			'typo3' => '6.2.0-7.6.99',
 		),
 		'conflicts' => 
 		array (
