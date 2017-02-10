@@ -196,6 +196,6 @@ class RecordRecordList extends DatabaseRecordList
 		return $this->browseURL;
 	}
 	public function getSearchURL() {
-		return $this->getBrowseURL();
+		return $this->getBrowseURL() . '&pointer=0';
 	}
 }
