@@ -11,16 +11,6 @@ if (TYPO3_MODE === 'BE') {
 				label = LLL:EXT:recordlink/Resources/Private/Language/locallang_be.xlf:record
 				scanAfter = page
 				configuration {
-                    category {
-                        label = Category
-                        table = sys_category
-                        pid = 
-                    }
-                    page {
-                        label = Page
-                        table = pages
-                        pid = 
-                    }
 				}
 			}
 		}

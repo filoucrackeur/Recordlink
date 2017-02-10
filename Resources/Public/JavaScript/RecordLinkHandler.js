@@ -34,10 +34,10 @@ define(['jquery', 'TYPO3/CMS/Recordlist/LinkBrowser'], function($, LinkBrowser) 
 	RecordLinkHandler.linkRecord = function(event) {
 		event.preventDefault();
 
-		var id = $(this).data('id');
-		var anchor = $(this).data('anchor');
+		var config = $(this).data('config');
+		var uid = $(this).data('uid');
 
-		LinkBrowser.finalizeFunction('page:' + id + (anchor ? anchor : ''));
+		LinkBrowser.finalizeFunction('record:' + config + ':' + uid);
 	};
 
 	/**
@@ -47,7 +47,7 @@ define(['jquery', 'TYPO3/CMS/Recordlist/LinkBrowser'], function($, LinkBrowser) 
 	RecordLinkHandler.linkCurrent = function(event) {
 		event.preventDefault();
 
-		LinkBrowser.finalizeFunction('page:' + PageLinkHandler.currentLink);
+		LinkBrowser.finalizeFunction('record:' + RecordLinkHandler.currentLink);
 	};
 
 	$(function() {
