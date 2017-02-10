@@ -29,6 +29,14 @@ For RTE ::
 	RTE.default.tx_recordlink.category < mod.tx_recordlink.category
 
 
+For TYPO3 7.6::
+
+    TCEMAIN.linkHandler.record.configuration < mod.tx_recordlink
+
+Deprecation ::
+
+    mod.tx_recordlink and RTE.default.tx_recordlink will be remove from version 1.2.0
+
 Reference TypoScript
 ^^^^^^^^^^^^^^^^^^^^
 
