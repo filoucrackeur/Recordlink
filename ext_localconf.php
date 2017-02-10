@@ -3,11 +3,14 @@ if (!defined ('TYPO3_MODE')) {
   die ('Access denied.');
 }
 
-// Deprecated: Remove from TYPO3 7.6
 
 // Register linkhandler for "record"
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.tslib_content.php']['typolinkLinkHandler']['record']
     = 'Intera\Recordlink\Hooks\LinkHandler';
+
+
+
+// Deprecated: Remove from TYPO3 7.6
 
 // Register hooks
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['typo3/class.browse_links.php']['browseLinksHook']['record']

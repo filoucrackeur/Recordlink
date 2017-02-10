@@ -47,7 +47,7 @@ define(['jquery', 'TYPO3/CMS/Recordlist/LinkBrowser'], function($, LinkBrowser) 
 	RecordLinkHandler.linkCurrent = function(event) {
 		event.preventDefault();
 
-		LinkBrowser.finalizeFunction('record:' + RecordLinkHandler.currentLink);
+		LinkBrowser.finalizeFunction(RecordLinkHandler.currentLink);
 	};
 
 	$(function() {
