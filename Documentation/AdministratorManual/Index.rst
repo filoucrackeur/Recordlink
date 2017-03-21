@@ -16,7 +16,7 @@ Reference TsConfig
 
 Define custom link type in wizard browser. An example would be ::
 
-	mod.tx_recordlink {
+	TCEMAIN.linkHandler.record.configuration {
 		category {
 			label = Categories
 			table = sys_category
@@ -24,18 +24,11 @@ Define custom link type in wizard browser. An example would be ::
 		}
 	}
 
-For RTE ::
+CHANGE NOTE ::
 
-	RTE.default.tx_recordlink.category < mod.tx_recordlink.category
+	mod.tx_recordlink and RTE.default.tx_recordlink don't work anymore, use TCEMAIN instead
 
 
-For TYPO3 7.6::
-
-    TCEMAIN.linkHandler.record.configuration < mod.tx_recordlink
-
-Deprecation ::
-
-    mod.tx_recordlink and RTE.default.tx_recordlink will be remove from version 1.2.0
 
 Reference TypoScript
 ^^^^^^^^^^^^^^^^^^^^

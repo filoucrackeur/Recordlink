@@ -22,6 +22,7 @@ use TYPO3\CMS\Recordlist\LinkHandler\AbstractLinkHandler;
 use TYPO3\CMS\Recordlist\LinkHandler\LinkHandlerInterface;
 use TYPO3\CMS\Recordlist\Controller\AbstractLinkBrowserController;
 use TYPO3\CMS\Recordlist\Tree\View\LinkParameterProviderInterface;
+use Intera\Recordlink\RecordList\RecordRecordList;
 
 /**
  * Link handler for record links
@@ -120,7 +121,6 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
      */
     public function render(ServerRequestInterface $request)
     {
-	    //GeneralUtility::makeInstance(PageRenderer::class)->loadRequireJsModule('TYPO3/CMS/Recordlist/PageLinkHandler');
         GeneralUtility::makeInstance(PageRenderer::class)->loadRequireJsModule('TYPO3/CMS/Recordlink/RecordLinkHandler');
 
         $recordselector = $this->getRecordSelector();
@@ -232,21 +232,35 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
 
         if ($table) {
 
-	        $recordRecordList = GeneralUtility::makeInstance(\Intera\Recordlink\RecordList\RecordRecordList::class);
+	        $recordRecordList = GeneralUtility::makeInstance(RecordRecordList::class);
 	        $recordRecordList->configKey = $configKey;
 	        $recordRecordList->iLimit = 10;
 	        $recordRecordList->disableSingleTableView = TRUE;
 	        $recordRecordList->clickMenuEnabled = FALSE;
 	        $recordRecordList->noControlPanels = TRUE;
 	        $recordRecordList->searchLevels = FALSE;
-	        $recordRecordList->setOverrideUrlParameters(array('linkAttributes' => GeneralUtility::_GP('linkAttributes'), 'P' => GeneralUtility::_GP('P')));
 
+	        // TODO: Fare in modo migliore, soprattutto su RTE
+	        $overrideParams = array(
+		        'linkAttributes' => GeneralUtility::_GP('linkAttributes'),
+		        'P' => GeneralUtility::_GP('P'),
+		        'bparams' => GeneralUtility::_GP('bparams'),
+		        'editorNo' => GeneralUtility::_GP('editorNo'),
+		        'RTEtsConfigParams' => GeneralUtility::_GP('RTEtsConfigParams'),
+		        'curUrl' => GeneralUtility::_GP('curUrl'),
+	        );
+	        foreach ($overrideParams as $k => $v) {
+	        	if (empty($v)) {
+	        		unset($overrideParams[$k]);
+		        }
+	        }
+
+	        $recordRecordList->setOverrideUrlParameters($overrideParams);
 	        $recordRecordList->start(
 	        	$id, $table, $pointer,
 		        $searchString,
 		        $recursive, 10
 	        );
-	        //$recordRecordList->generateList();
             $list = $recordRecordList->getTable($table, $id, $GLOBALS['TCA'][$table]['ctrl']['label']);
 
             if (empty($list)) {
@@ -256,7 +270,6 @@ class RecordLinkHandler extends AbstractLinkHandler implements LinkHandlerInterf
             } else {
                 $out .= $list;
             }
-            //linkWrapItems
             $out .= $recordRecordList->getSearchBox();
 
         }

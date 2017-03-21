@@ -1,13 +1,11 @@
 
-mod.tx_recordlink {
-    category {
-        label = Categories
-        table = sys_category
-        pid = 
-    }
+# TS Config Recordlink Example
+
+TCEMAIN.linkHandler.record.configuration {
+	category {
+		 label = Categories
+		 table = sys_category
+		 pid =
+		 recursive =
+	}
 }
-
-RTE.default.tx_recordlink.category < mod.tx_recordlink.category
-
-# TYPO3 7.6 Compatibility
-TCEMAIN.linkHandler.record.configuration < mod.tx_recordlink
