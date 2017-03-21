@@ -1,10 +1,11 @@
 
-mod.tx_recordlink {
-    category {
-        label = Categories
-        table = sys_category
-        pid = 
-    }
-}
+# TS Config Recordlink Example
 
-RTE.default.tx_recordlink.category < mod.tx_recordlink.category
+TCEMAIN.linkHandler.record.configuration {
+	category {
+		 label = Categories
+		 table = sys_category
+		 pid =
+		 recursive =
+	}
+}
